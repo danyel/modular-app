@@ -23,10 +23,12 @@ public class ApplicationPropertiesFactoryBean implements FactoryBean<FileWatchAb
         if (isEmpty(property) && defaultApplicationConfigurationLocation.exists()) {
             resource = defaultApplicationConfigurationLocation;
         } else if (!isEmpty(property)) {
-            final FileSystemResource fileSystemResource = new FileSystemResource(property);
+            final Resource givenResource = "classpath:".startsWith(property) ?
+                    new ClassPathResource(property.substring("classpath:".length())) :
+                    new FileSystemResource(property);
 
-            if (fileSystemResource.exists()) {
-                resource = fileSystemResource;
+            if (givenResource.exists()) {
+                resource = givenResource;
             }
         }
 
