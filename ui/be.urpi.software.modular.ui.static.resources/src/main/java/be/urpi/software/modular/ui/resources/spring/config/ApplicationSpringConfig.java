@@ -1,9 +1,9 @@
 package be.urpi.software.modular.ui.resources.spring.config;
 
-import be.urpi.software.modular.core.watcher.file.FileWatcher;
-import be.urpi.software.modular.core.watcher.file.ThreadFileWatcher;
 import be.urpi.software.modular.core.properties.FileWatchAbleApplicationProperties;
 import be.urpi.software.modular.core.properties.factory.ApplicationPropertiesFactoryBean;
+import be.urpi.software.modular.core.watcher.file.FileWatcher;
+import be.urpi.software.modular.core.watcher.file.ThreadFileWatcher;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
