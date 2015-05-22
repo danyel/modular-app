@@ -1,6 +1,6 @@
 package be.urpi.software.modular.core.properties.factory;
 
-import be.urpi.software.modular.core.properties.WatchAbleApplicationProperties;
+import be.urpi.software.modular.core.properties.FileWatchAbleApplicationProperties;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.io.ClassPathResource;
@@ -13,10 +13,10 @@ import static com.google.common.base.Throwables.propagate;
 import static java.lang.System.getProperty;
 import static org.springframework.util.StringUtils.isEmpty;
 
-public class ApplicationPropertiesFactoryBean implements FactoryBean<WatchAbleApplicationProperties> {
+public class ApplicationPropertiesFactoryBean implements FactoryBean<FileWatchAbleApplicationProperties> {
     private final ClassPathResource defaultApplicationConfigurationLocation = new ClassPathResource("classpath:/be/urpi/software/modular/ui/static/resources/ApplicationConfiguration.properties");
 
-    public WatchAbleApplicationProperties getObject() throws Exception {
+    public FileWatchAbleApplicationProperties getObject() throws Exception {
         final String property = getProperty("application.properties.location");
         Resource resource = null;
 
@@ -31,7 +31,7 @@ public class ApplicationPropertiesFactoryBean implements FactoryBean<WatchAbleAp
         }
 
         if (resource != null) {
-            final WatchAbleApplicationProperties properties = new WatchAbleApplicationProperties();
+            final FileWatchAbleApplicationProperties properties = new FileWatchAbleApplicationProperties();
             try {
                 properties.load(resource);
                 return properties;
@@ -46,7 +46,7 @@ public class ApplicationPropertiesFactoryBean implements FactoryBean<WatchAbleAp
     }
 
     public Class<?> getObjectType() {
-        return WatchAbleApplicationProperties.class;
+        return FileWatchAbleApplicationProperties.class;
     }
 
     public boolean isSingleton() {

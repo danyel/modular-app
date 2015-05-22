@@ -12,9 +12,11 @@
     <packaging>pom</packaging>
     <name>${core.application.name} Parent</name>
     <modules>
+        <module>../be.urpi.software.modular.core.watcher</module>
         <module>../be.urpi.software.modular.core.properties</module>
         <module>../be.urpi.software.modular.core.rest</module>
         <module>../test/be.urpi.software.modular.core.test.parent</module>
+        <module>../be.urpi.software.modular.core.application.reload</module>
     </modules>
     <groupId>be.urpi.software.modular.core</groupId>
     <artifactId>be.urpi.software.modular.core.parent</artifactId>

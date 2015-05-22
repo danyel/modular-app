@@ -47,6 +47,12 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>be.urpi.software.modular.core</groupId>
+                <artifactId>be.urpi.software.modular.core.watcher</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>be.urpi.software.modular.core.parent</artifactId>
@@ -10,13 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>be.urpi.software.modular.core.properties</artifactId>
-    <name>${core.application.name} Properties</name>
+    <artifactId>be.urpi.software.modular.core.watcher</artifactId>
+    <name>${core.application.name} Watcher</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>be.urpi.software.modular.core</groupId>
-            <artifactId>be.urpi.software.modular.core.watcher</artifactId>
-        </dependency>
-    </dependencies>
 </project>
