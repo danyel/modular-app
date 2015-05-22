@@ -3,18 +3,21 @@ package be.urpi.software.modular.core.watcher;
 import be.urpi.software.modular.core.watcher.directory.DirectoryWatchAble;
 import be.urpi.software.modular.core.watcher.file.FileWatchAble;
 
+import org.springframework.beans.factory.InitializingBean;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Throwables.propagate;
 import static java.lang.Boolean.TRUE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread implements Watcher<WA> {
+public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread implements Watcher<WA>, InitializingBean {
     private final WA watchAble;
     private AtomicBoolean stop = new AtomicBoolean(false);
 
@@ -78,11 +81,11 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
                         continue;
                     } else if (kind == on()) {
                         if (watchAble instanceof FileWatchAble && filename.toString().equals(getFile().getName())) {
-                            doOnChange();
+                            ((FileWatchAble) watchAble).doOnChange();
                         }
 
                         if (watchAble instanceof DirectoryWatchAble) {
-                            doOnChange();
+                            ((DirectoryWatchAble) watchAble).doOnChange(filename.toFile());
                         }
                     }
                     final boolean valid = key.reset();
@@ -101,15 +104,16 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
         return watchAble.getFile();
     }
 
-    void doOnChange() throws IOException {
-        watchAble.doOnChange();
-    }
-
     void doOnStart() throws IOException {
         watchAble.doOnStart();
     }
 
-    WatchEvent.Kind<Path> on(){
+    WatchEvent.Kind<Path> on() {
         return watchAble.on();
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        checkState(watchAble instanceof FileWatchAble || watchAble instanceof DirectoryWatchAble);
     }
 }

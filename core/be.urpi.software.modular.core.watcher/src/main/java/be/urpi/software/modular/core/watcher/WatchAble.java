@@ -10,8 +10,6 @@ import java.nio.file.WatchEvent;
 public interface WatchAble extends InitializingBean {
     File getFile() throws IOException;
 
-    void doOnChange() throws IOException;
-
     void doOnStart() throws IOException;
 
     WatchEvent.Kind<Path> on();
