@@ -3,6 +3,8 @@ package be.urpi.software.modular.core.application.reload;
 import be.urpi.software.modular.core.watcher.directory.DirectoryWatchAble;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +20,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class ClassPathReload implements DirectoryWatchAble {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassPathReload.class);
     private String source;
     private String destination;
     private File sourceDirectory;
@@ -76,7 +79,7 @@ public class ClassPathReload implements DirectoryWatchAble {
         final File destinationFile = new File(destinationDirectory, fileName);
         FileUtils.copyFile(sourceFile, destinationFile);
         URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        Method m = null;
+        Method m;
         try {
             m = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
 
@@ -84,15 +87,13 @@ public class ClassPathReload implements DirectoryWatchAble {
             m.invoke(urlClassLoader, destinationFile.toURI().toURL());
             String cp = System.getProperty("java.class.path");
             if (cp != null) {
-                System.out.println(cp);
                 cp += File.pathSeparatorChar + destinationFile.getCanonicalPath();
             } else {
                 cp = destinationFile.toURI().getPath();
             }
             System.setProperty("java.class.path", cp);
-            System.out.println(System.getProperty("java.class.path"));
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
     }
 }

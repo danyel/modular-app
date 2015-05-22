@@ -13,6 +13,7 @@
     <name>${module.application.name} Parent</name>
     <modules>
         <module>../security/be.urpi.software.modular.module.security.parent</module>
+        <module>../classpath/be.urpi.software.modular.module.classpathloader.parent</module>
     </modules>
     <groupId>be.urpi.software.modular.module</groupId>
     <artifactId>be.urpi.software.modular.module.parent</artifactId>

@@ -19,6 +19,12 @@ public class FileWatchAbleApplicationProperties extends Properties implements Fi
 
     public synchronized void load(final Resource resource) throws IOException {
         this.resource = resource;
+        load(resource.getInputStream());
+    }
+
+    public void setResource(final Resource resource) throws IOException {
+        this.resource = resource;
+        load(resource.getInputStream());
     }
 
     @Override
