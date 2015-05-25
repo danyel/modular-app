@@ -17,6 +17,7 @@
 
     <modules>
         <module>../be.urpi.software.modular.module.classpathloader.model</module>
+        <module>../be.urpi.software.modular.module.classpathloader.rest</module>
     </modules>
 
     <properties>

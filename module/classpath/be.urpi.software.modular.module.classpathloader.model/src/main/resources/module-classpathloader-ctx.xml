@@ -8,7 +8,8 @@
         <property name="source" value="${classpath.reload.source}"/>
     </bean>
 
-    <bean class="be.urpi.software.modular.core.watcher.directory.ThreadDirectoryWatcher">
+    <bean class="be.urpi.software.modular.core.watcher.directory.ThreadDirectoryWatcher"
+          destroy-method="stopThread" init-method="startThread">
         <constructor-arg name="directoryWatchAble" ref="directoryWatchAble"/>
     </bean>
 </beans>

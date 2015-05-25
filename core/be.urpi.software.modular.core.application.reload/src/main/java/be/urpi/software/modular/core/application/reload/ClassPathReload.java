@@ -5,6 +5,9 @@ import be.urpi.software.modular.core.watcher.directory.DirectoryWatchAble;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,12 +22,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
-public class ClassPathReload implements DirectoryWatchAble {
+public class ClassPathReload implements DirectoryWatchAble, ApplicationContextAware {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassPathReload.class);
     private String source;
     private String destination;
     private File sourceDirectory;
     private File destinationDirectory;
+    private AnnotationConfigWebApplicationContext applicationContext;
 
     public ClassPathReload() {
     }
@@ -44,7 +48,7 @@ public class ClassPathReload implements DirectoryWatchAble {
     @Override
     public void doOnStart() throws IOException {
         // all ready checked can never be null after afterPropertiesSet() is executed
-        for (final File file : destinationDirectory.listFiles()) {
+        for (final File file : sourceDirectory.listFiles()) {
             FileUtils.forceDelete(file);
         }
     }
@@ -92,8 +96,14 @@ public class ClassPathReload implements DirectoryWatchAble {
                 cp = destinationFile.toURI().getPath();
             }
             System.setProperty("java.class.path", cp);
+            applicationContext.refresh();
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             LOGGER.error(e.getMessage());
         }
+    }
+
+    @Override
+    public void setApplicationContext(final ApplicationContext applicationContext) {
+        this.applicationContext = (AnnotationConfigWebApplicationContext) applicationContext;
     }
 }

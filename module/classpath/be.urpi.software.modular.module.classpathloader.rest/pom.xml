@@ -3,16 +3,16 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>be.urpi.software.modular.core.test.parent</artifactId>
-        <groupId>be.urpi.software.modular.core.test</groupId>
+        <artifactId>be.urpi.software.modular.module.classpathloader.parent</artifactId>
+        <groupId>be.urpi.software.modular.module.classpathloader</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../be.urpi.software.modular.core.test.parent/pom.xml</relativePath>
+        <relativePath>../be.urpi.software.modular.module.classpathloader.parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>${test.core.application.name} Rest</name>
-    <artifactId>be.urpi.software.modular.core.test.rest</artifactId>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
+    <groupId>be.urpi.software.modular.module.classpathloader</groupId>
+    <artifactId>be.urpi.software.modular.module.classpathloader.rest</artifactId>
     <build>
         <plugins>
             <plugin>
@@ -35,11 +35,16 @@
             </plugin>
         </plugins>
     </build>
-
     <dependencies>
+        <dependency>
+            <groupId>be.urpi.software.modular.module.classpathloader</groupId>
+            <artifactId>be.urpi.software.modular.module.classpathloader.model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>be.urpi.software.modular.core</groupId>
             <artifactId>be.urpi.software.modular.core.rest</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
