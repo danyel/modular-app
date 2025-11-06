@@ -2,7 +2,6 @@ package be.urpi.software.modular.core.watcher;
 
 import be.urpi.software.modular.core.watcher.directory.DirectoryWatchAble;
 import be.urpi.software.modular.core.watcher.file.FileWatchAble;
-
 import org.springframework.beans.factory.InitializingBean;
 
 import java.io.File;
@@ -12,21 +11,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Throwables.propagate;
 import static java.lang.Boolean.TRUE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread implements Watcher<WA>, InitializingBean {
     private final WA watchAble;
-    private AtomicBoolean stop = new AtomicBoolean(false);
+    private final AtomicBoolean stop = new AtomicBoolean(false);
 
-    protected AbstractThreadWatcher(final WA watchAble) throws WatchAbleException {
+    protected AbstractThreadWatcher( WA watchAble) throws WatchAbleException {
         checkNotNull(watchAble);
         try {
             watchAble.afterPropertiesSet();
         } catch (final Exception exception) {
-            propagate(new WatchAbleException(exception));
+            throw new WatchAbleException(exception);
         }
         this.watchAble = watchAble;
     }
@@ -42,7 +40,7 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
             doOnStart();
             super.start();
         } catch (final IOException e) {
-            throw propagate(e);
+            throw new WatchAbleException(e);
         }
     }
 
@@ -53,50 +51,47 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
 
     @Override
     public void run() {
-        try (final WatchService watcher = FileSystems.getDefault().newWatchService()) {
-            final Path path = watchAble instanceof FileWatchAble ? getFile().toPath().getParent() : getFile().toPath();
+        try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
+            Path path = watchAble instanceof FileWatchAble ? getFile().toPath().getParent() : getFile().toPath();
             path.register(watcher, on());
 
             while (isActive()) {
-                WatchKey key;
                 try {
-                    key = watcher.poll(25, MILLISECONDS);
+                    WatchKey key = watcher.poll(25, MILLISECONDS);
+                    if (key == null) {
+                        Thread.yield();
+                        continue;
+                    }
+                    for (WatchEvent<?> polledWatchEvent : key.pollEvents()) {
+                        WatchEvent.Kind<?> kind = polledWatchEvent.kind();
+
+                        @SuppressWarnings("unchecked") final WatchEvent<Path> pathWatchEvent = (WatchEvent<Path>) polledWatchEvent;
+                        Path filename = pathWatchEvent.context();
+
+                        if (kind == OVERFLOW) {
+                            Thread.yield();
+                            continue;
+                        } else if (kind == on()) {
+                            if (watchAble instanceof FileWatchAble fileWatchAble && filename.toString().equals(getFile().getName())) {
+                                fileWatchAble.doOnChange();
+                            }
+
+                            if (watchAble instanceof DirectoryWatchAble directoryWatchAble) {
+                                directoryWatchAble.doOnChange(filename.toFile());
+                            }
+                        }
+                        boolean valid = key.reset();
+                        if (!valid) {
+                            break;
+                        }
+                    }
+                    Thread.yield();
                 } catch (final InterruptedException e) {
                     return;
                 }
-                if (key == null) {
-                    Thread.yield();
-                    continue;
-                }
-
-                for (final WatchEvent<?> polledWatchEvent : key.pollEvents()) {
-                    final WatchEvent.Kind<?> kind = polledWatchEvent.kind();
-
-                    @SuppressWarnings("unchecked")
-                    final WatchEvent<Path> pathWatchEvent = (WatchEvent<Path>) polledWatchEvent;
-                    final Path filename = pathWatchEvent.context();
-
-                    if (kind == OVERFLOW) {
-                        Thread.yield();
-                        continue;
-                    } else if (kind == on()) {
-                        if (watchAble instanceof FileWatchAble && filename.toString().equals(getFile().getName())) {
-                            ((FileWatchAble) watchAble).doOnChange();
-                        }
-
-                        if (watchAble instanceof DirectoryWatchAble) {
-                            ((DirectoryWatchAble) watchAble).doOnChange(filename.toFile());
-                        }
-                    }
-                    final boolean valid = key.reset();
-                    if (!valid) {
-                        break;
-                    }
-                }
-                Thread.yield();
             }
         } catch (final Throwable e) {
-            throw propagate(e);
+            throw new WatchAbleException(e);
         }
     }
 

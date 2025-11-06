@@ -41,5 +41,9 @@
             <groupId>be.urpi.software.modular.core</groupId>
             <artifactId>be.urpi.software.modular.core.rest</artifactId>
         </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
     </dependencies>
 </project>

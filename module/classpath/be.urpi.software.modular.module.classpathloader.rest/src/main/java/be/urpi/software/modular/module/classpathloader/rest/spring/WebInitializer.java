@@ -7,22 +7,22 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRegistration;
 import java.io.IOException;
 
 public class WebInitializer implements WebApplicationInitializer {
-    public void onStartup(final ServletContext servletContext) throws ServletException {
+    public void onStartup(ServletContext servletContext) throws ServletException {
         try {
             Reloader.reload("/Users/danyel/test/classpath");
-            final AnnotationConfigWebApplicationContext uiContext = new AnnotationConfigWebApplicationContext();
+            AnnotationConfigWebApplicationContext uiContext = new AnnotationConfigWebApplicationContext();
             uiContext.setDisplayName("UI Web");
             uiContext.register(ClassPathLoaderRestConfiguration.class);
             servletContext.addListener(new ContextLoaderListener(uiContext));
 
             //Dispatcher servlet
-            final ServletRegistration.Dynamic uiDispatcher = servletContext.addServlet("uiDispatcher", new DispatcherServlet(uiContext));
+            ServletRegistration.Dynamic uiDispatcher = servletContext.addServlet("uiDispatcher", new DispatcherServlet(uiContext));
             uiDispatcher.setLoadOnStartup(1);
             uiDispatcher.addMapping("/api/*");
         } catch (IOException e) {

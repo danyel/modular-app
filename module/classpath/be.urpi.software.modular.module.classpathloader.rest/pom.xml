@@ -13,7 +13,7 @@
 
     <groupId>be.urpi.software.modular.module.classpathloader</groupId>
     <artifactId>be.urpi.software.modular.module.classpathloader.rest</artifactId>
-    <build>
+    <!--<build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -21,7 +21,7 @@
                 <version>2.3</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <!--       <webResources>
+                    &lt;!&ndash;       <webResources>
                                <resource>
                                    <directory>${basedir}/src/main/webapp/application/js/service</directory>
                                    <filtering>true</filtering>
@@ -30,21 +30,21 @@
                                        <include>**/LoggingService.js</include>
                                    </includes>
                                </resource>
-                           </webResources>-->
+                           </webResources>&ndash;&gt;
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+    </build>-->
     <dependencies>
         <dependency>
             <groupId>be.urpi.software.modular.module.classpathloader</groupId>
             <artifactId>be.urpi.software.modular.module.classpathloader.model</artifactId>
-            <version>${project.version}</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>be.urpi.software.modular.core</groupId>
             <artifactId>be.urpi.software.modular.core.rest</artifactId>
-            <version>${project.version}</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

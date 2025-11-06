@@ -6,7 +6,7 @@
     <bean id="applicationPropertiesFile"
           class="be.urpi.software.modular.core.properties.factory.ApplicationPropertiesFactoryBean"/>
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="properties" ref="applicationPropertiesFile"/>
     </bean>
 

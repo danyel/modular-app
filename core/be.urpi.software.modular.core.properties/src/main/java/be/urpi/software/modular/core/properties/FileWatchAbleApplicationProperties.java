@@ -1,7 +1,6 @@
 package be.urpi.software.modular.core.properties;
 
 import be.urpi.software.modular.core.watcher.file.FileWatchAble;
-
 import org.springframework.core.io.Resource;
 
 import java.io.File;
@@ -17,12 +16,12 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 public class FileWatchAbleApplicationProperties extends Properties implements FileWatchAble {
     private Resource resource;
 
-    public synchronized void load(final Resource resource) throws IOException {
+    public synchronized void load(Resource resource) throws IOException {
         this.resource = resource;
         load(resource.getInputStream());
     }
 
-    public void setResource(final Resource resource) throws IOException {
+    public void setResource(Resource resource) throws IOException {
         this.resource = resource;
         load(resource.getInputStream());
     }
