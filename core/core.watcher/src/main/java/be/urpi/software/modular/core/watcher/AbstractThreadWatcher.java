@@ -24,11 +24,12 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
 
     protected AbstractThreadWatcher(WA watchAble) throws WatchAbleException {
         checkNotNull(watchAble);
+        watchAble.checkState();
         try {
             watchService = FileSystems.getDefault().newWatchService();
             this.watchAble = watchAble;
             log.info("Starting watcher {}", watchAble.getFile().getAbsolutePath());
-            watchAble.afterPropertiesSet();
+            watchAble.checkState();
         } catch (Exception exception) {
             throw new WatchAbleException(exception);
         }
@@ -72,7 +73,7 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
         while (isActive()) {
             try {
                 // every 20 seconds
-                WatchKey key = watchService.poll(20, SECONDS);
+                WatchKey key = watchService.poll(5, SECONDS);
                 if (key == null) {
                     continue;
                 }
@@ -84,9 +85,8 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
                     @SuppressWarnings("unchecked")
                     WatchEvent<Path> ev = (WatchEvent<Path>) event;
                     Path filename = ev.context();
-
-                    if (watchAble instanceof FileWatchAble fileWatchAble &&
-                            filename.toString().equals(getFile().getName())) {
+                    log.debug("File Watchable: {} and for folder: {}", watchAble.getClass().getSimpleName(), getFile().getAbsolutePath());
+                    if (watchAble instanceof FileWatchAble fileWatchAble) {
                         fileWatchAble.doOnChange();
                     }
 

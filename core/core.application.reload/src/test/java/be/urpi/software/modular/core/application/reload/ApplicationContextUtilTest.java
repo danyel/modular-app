@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 @ExtendWith(SpringExtension.class)
-class ClassPathUtilTest {
+class ApplicationContextUtilTest {
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -25,8 +25,8 @@ class ClassPathUtilTest {
         FileUtils.copyFile(file, new File(jarDirectory, "module-x.jar"));
         FileUtils.copyFile(coreRest, new File(jarDirectory, "core-rest.jar"));
         Assertions.assertTrue(file.exists());
-        ClassPathUtil.refresh(applicationContext, coreRest);
-        ClassPathUtil.refresh(applicationContext, file);
+        ApplicationContextUtil.refresh(applicationContext, coreRest);
+        ApplicationContextUtil.refresh(applicationContext, file);
         Assertions.assertTrue(applicationContext.containsBean("helloService"));
     }
 }

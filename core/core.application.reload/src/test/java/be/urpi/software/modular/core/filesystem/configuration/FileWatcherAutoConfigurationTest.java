@@ -23,6 +23,6 @@ class FileWatcherAutoConfigurationTest {
     @Test
     void shouldCreateBean() {
         assertThat(context.getBean("classPathReload")).isInstanceOf(FileWatchAble.class);
-        assertThat(context.getBean("classPathReload")).isSameAs(context.getBean(FileWatchAble.class));
+        assertThat(context.getBean("classPathReload")).isSameAs(context.getBean("classPathReload", FileWatchAble.class));
     }
 }

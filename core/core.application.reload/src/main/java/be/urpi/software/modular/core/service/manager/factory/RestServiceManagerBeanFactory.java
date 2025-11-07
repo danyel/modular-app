@@ -9,9 +9,8 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import java.util.HashMap;
 import java.util.Map;
-
-import static com.google.common.collect.Maps.newHashMap;
 
 public class RestServiceManagerBeanFactory implements FactoryBean<RestServiceManager>, ApplicationContextAware {
     private final RestServiceManagerBean restServiceManagerBean = new RestServiceManagerBean();
@@ -30,7 +29,7 @@ public class RestServiceManagerBeanFactory implements FactoryBean<RestServiceMan
 
     private static class RestServiceManagerBean implements RestServiceManager {
         @SuppressWarnings("rawtypes")
-        Map<String, RestService> restServiceRegistry = newHashMap();
+        Map<String, RestService> restServiceRegistry = new HashMap<>();
 
         @SuppressWarnings("rawtypes")
         @Override

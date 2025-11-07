@@ -9,6 +9,7 @@ public interface RestServiceManager {
     String BEAN_NAME = "restServiceManager";
 
     <S, E> RestService<S, E> locateByName(String restServiceName) throws RestServiceNameNotFoundException;
+
     void load(ApplicationContext applicationContext);
 
     static RestServiceManager getInstance(ApplicationContext applicationContext) {
