@@ -6,14 +6,23 @@ import be.urpi.software.modular.core.watcher.directory.DirectoryWatchAble;
 import be.urpi.software.modular.core.watcher.directory.ThreadDirectoryWatcher;
 import be.urpi.software.modular.core.watcher.file.FileWatchAble;
 import be.urpi.software.modular.core.watcher.file.ThreadFileWatcher;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
+
+import java.io.IOException;
 
 @AutoConfiguration
-class FileWatcherAutoConfiguration {
+@Setter
+class FileWatcherAutoConfiguration implements ApplicationContextAware {
+    private ApplicationContext applicationContext;
     private static final Logger log = LoggerFactory.getLogger(FileWatcherAutoConfiguration.class);
 
     @Bean
@@ -34,5 +43,11 @@ class FileWatcherAutoConfiguration {
         ThreadDirectoryWatcher threadDirectoryWatcher = new ThreadDirectoryWatcher(classPathReload);
         threadDirectoryWatcher.start();
         return classPathReload;
+    }
+
+    @EventListener(ApplicationStartedEvent.class)
+    void onApplicationEvent(ApplicationStartedEvent ignoredEvent) throws IOException {
+        FileWatchAble classPathReload = applicationContext.getBean("classPathReload", FileWatchAble.class);
+        classPathReload.doOnChange();
     }
 }

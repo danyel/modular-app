@@ -22,7 +22,8 @@ class ClassPathUtil {
     static final Logger log = LoggerFactory.getLogger(ClassPathUtil.class);
     static final String JAVA_CLASS_PATH = "java.class.path";
     private static final Map<File, AnnotationConfigApplicationContext> modules = new ConcurrentHashMap<>();
-    private final static String baseName = "be.urpi.software.modular";
+    private final static String MODULAR_PACKAGE = "be.urpi.software.modular";
+    public static final String SPRING_PACKAGE = "org.springframework";
 
     ClassPathUtil() {
         throw new IllegalAccessError("You can not instantiate an utility class.");
@@ -87,7 +88,7 @@ class ClassPathUtil {
                 try (JarFile jf = new JarFile(file)) {
                     var entries = jf.stream()
                             .map(ZipEntry::getName)
-                            .filter(name -> name.endsWith(".class") && !name.contains(baseName.replace(".", "/")))
+                            .filter(name -> name.endsWith(".class") && (!name.contains(MODULAR_PACKAGE.replace(".", "/")) || !name.contains(SPRING_PACKAGE.replace(".", "/"))))
                             .toList();
 
                     for (String entry : entries) {
@@ -96,7 +97,10 @@ class ClassPathUtil {
                             Class<?> clazz = Class.forName(className, false, moduleLoader);
                             // only register classes that look like configuration or component classes
                             if (clazz.getAnnotation(org.springframework.context.annotation.Configuration.class) != null
+                                    || clazz.getAnnotation(org.springframework.stereotype.Controller.class) != null
                                     || clazz.getAnnotation(org.springframework.stereotype.Component.class) != null
+                                    || clazz.getAnnotation(org.springframework.stereotype.Service.class) != null
+                                    || clazz.getAnnotation(org.springframework.stereotype.Repository.class) != null
                                     || clazz.getAnnotation(org.springframework.web.bind.annotation.RestController.class) != null) {
                                 moduleContext.register(clazz);
                             }
@@ -114,7 +118,6 @@ class ClassPathUtil {
                 String[] beanNames = moduleContext.getBeanDefinitionNames();
                 Arrays.sort(beanNames);
                 log.debug("Loaded module from JAR: {}", file.getAbsolutePath());
-                log.debug("Module classloader: {}", moduleContext.getClassLoader());
                 for (String b : beanNames) {
                     try {
                         Object bean = moduleContext.getBean(b);

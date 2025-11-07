@@ -7,8 +7,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test")
 @RestController
 class WorldService {
+    private final WorldResourceService worldResourceService;
+
+    WorldService(WorldResourceService worldResourceService) {
+        this.worldResourceService = worldResourceService;
+    }
+
     @GetMapping
     String helloWorld() {
-        return "hello world";
+        return worldResourceService.hello();
     }
 }

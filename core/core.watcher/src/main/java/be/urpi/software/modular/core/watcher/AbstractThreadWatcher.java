@@ -15,7 +15,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Boolean.TRUE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread implements Watcher<WA>, InitializingBean {
     private static final Logger log = LoggerFactory.getLogger(AbstractThreadWatcher.class);
@@ -72,7 +72,8 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
         log.debug("Running {}", getClass().getSimpleName());
         while (isActive()) {
             try {
-                WatchKey key = watchService.poll(250, MILLISECONDS);
+                // every 20 seconds
+                WatchKey key = watchService.poll(20, SECONDS);
                 if (key == null) {
                     continue;
                 }
@@ -120,7 +121,7 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         checkState(watchAble instanceof FileWatchAble || watchAble instanceof DirectoryWatchAble);
     }
 }
