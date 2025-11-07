@@ -42,7 +42,7 @@ public class RestServiceManagerBeanFactory implements FactoryBean<RestServiceMan
 
         @SuppressWarnings({"rawtypes", "unchecked"})
         @Override
-        public RestService locateByName(final String restServiceName) throws RestServiceNameNotFoundException {
+        public RestService locateByName(String restServiceName) throws RestServiceNameNotFoundException {
             if (restServiceRegistry.containsKey(restServiceName)) {
                 return restServiceRegistry.get(restServiceName);
             }

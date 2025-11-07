@@ -3,8 +3,7 @@ package be.urpi.software.modular.core.properties.factory;
 import be.urpi.software.modular.core.properties.FileWatchAbleApplicationProperties;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
@@ -16,8 +15,8 @@ import java.io.IOException;
 
 import static org.springframework.util.StringUtils.hasText;
 
+@Slf4j
 public class ApplicationPropertiesFactoryBean implements FactoryBean<FileWatchAbleApplicationProperties>, EnvironmentAware {
-    private final static Logger log = LoggerFactory.getLogger(ApplicationPropertiesFactoryBean.class);
     public static final String JAR_DIRECTORY = "application.modules";
     private final ClassPathResource defaultApplicationConfigurationLocation = new ClassPathResource("classpath:/be/urpi/software/modular/ui/static/resources/ApplicationConfiguration.properties");
     @Getter

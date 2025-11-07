@@ -3,24 +3,30 @@ package be.urpi.software.modular.core.application.reload;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.io.IOException;
 
+@ExtendWith(SpringExtension.class)
 class ClassPathUtilTest {
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Test
     void setOnClassPath() throws IOException {
-        Assertions.assertFalse(System.getProperty(ClassPathUtil.JAVA_CLASS_PATH).contains("module-x.jar"));
         File file = new ClassPathResource("module-x.jar").getFile();
-        System.out.println(file.getParentFile().getAbsolutePath());
-        File jarDirectory = new File(file.getParentFile().getAbsolutePath(), "/jar");
-        FileUtils.forceMkdir(jarDirectory);
-        File sourceJar = new File(jarDirectory.getAbsolutePath(), "module-x.jar");
+        File coreRest = new ClassPathResource("core-rest.jar").getFile();
+        File jarDirectory = new File(coreRest.getParentFile(), "jar");
+        FileUtils.copyFile(file, new File(jarDirectory, "module-x.jar"));
+        FileUtils.copyFile(coreRest, new File(jarDirectory, "core-rest.jar"));
         Assertions.assertTrue(file.exists());
-        FileUtils.copyFile(file, sourceJar);
-        ClassPathUtil.setOnClassPath(sourceJar);
-        Assertions.assertTrue(System.getProperty(ClassPathUtil.JAVA_CLASS_PATH).contains("module-x.jar"));
+        ClassPathUtil.refresh(applicationContext, coreRest);
+        ClassPathUtil.refresh(applicationContext, file);
+        Assertions.assertTrue(applicationContext.containsBean("helloService"));
     }
 }

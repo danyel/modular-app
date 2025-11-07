@@ -2,8 +2,7 @@ package be.urpi.software.modular.core.watcher;
 
 import be.urpi.software.modular.core.watcher.directory.DirectoryWatchAble;
 import be.urpi.software.modular.core.watcher.file.FileWatchAble;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.io.File;
@@ -17,8 +16,8 @@ import static java.lang.Boolean.TRUE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+@Slf4j
 public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread implements Watcher<WA>, InitializingBean {
-    private static final Logger log = LoggerFactory.getLogger(AbstractThreadWatcher.class);
     private final WA watchAble;
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final WatchService watchService;
@@ -30,7 +29,7 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
             this.watchAble = watchAble;
             log.info("Starting watcher {}", watchAble.getFile().getAbsolutePath());
             watchAble.afterPropertiesSet();
-        } catch (final Exception exception) {
+        } catch (Exception exception) {
             throw new WatchAbleException(exception);
         }
     }

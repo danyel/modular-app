@@ -7,8 +7,7 @@ import be.urpi.software.modular.core.watcher.directory.ThreadDirectoryWatcher;
 import be.urpi.software.modular.core.watcher.file.FileWatchAble;
 import be.urpi.software.modular.core.watcher.file.ThreadFileWatcher;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -21,9 +20,9 @@ import java.io.IOException;
 
 @AutoConfiguration
 @Setter
+@Slf4j
 class FileWatcherAutoConfiguration implements ApplicationContextAware {
     private ApplicationContext applicationContext;
-    private static final Logger log = LoggerFactory.getLogger(FileWatcherAutoConfiguration.class);
 
     @Bean
     FileWatchAble classPathReload(@Value("${module.reload.destination}") String destinationFolder) throws Exception {
