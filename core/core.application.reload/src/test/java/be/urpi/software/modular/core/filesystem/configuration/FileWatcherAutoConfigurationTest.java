@@ -1,6 +1,6 @@
 package be.urpi.software.modular.core.filesystem.configuration;
 
-import be.urpi.software.modular.core.watcher.directory.DirectoryWatchAble;
+import be.urpi.software.modular.core.watcher.file.FileWatchAble;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ class FileWatcherAutoConfigurationTest {
 
     @Test
     void shouldCreateBean() {
-        assertThat(context.getBean("classPathReload")).isInstanceOf(DirectoryWatchAble.class);
-        assertThat(context.getBean("classPathReload")).isSameAs(context.getBean(DirectoryWatchAble.class));
+        assertThat(context.getBean("classPathReload")).isInstanceOf(FileWatchAble.class);
+        assertThat(context.getBean("classPathReload")).isSameAs(context.getBean(FileWatchAble.class));
     }
 }

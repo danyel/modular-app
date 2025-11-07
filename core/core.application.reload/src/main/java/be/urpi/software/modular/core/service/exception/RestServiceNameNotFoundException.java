@@ -1,4 +1,4 @@
-package be.urpi.software.modular.core.rest.api.service.exception;
+package be.urpi.software.modular.core.service.exception;
 
 public class RestServiceNameNotFoundException extends Exception {
 

@@ -1,8 +1,8 @@
-package be.urpi.software.modular.core.rest.api.service.manager.factory;
+package be.urpi.software.modular.core.service.manager.factory;
 
-import be.urpi.software.modular.core.rest.api.service.RestService;
-import be.urpi.software.modular.core.rest.api.service.exception.RestServiceNameNotFoundException;
-import be.urpi.software.modular.core.rest.api.service.manager.RestServiceManager;
+import be.urpi.software.modular.core.service.RestService;
+import be.urpi.software.modular.core.service.exception.RestServiceNameNotFoundException;
+import be.urpi.software.modular.core.service.manager.RestServiceManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.FactoryBean;
@@ -22,13 +22,9 @@ public class RestServiceManagerBeanFactory implements FactoryBean<RestServiceMan
     @Getter
     private final Class<?> objectType = RestServiceManager.class;
 
-    void loadBeanOfTypeRestService() {
-        restServiceManagerBean.loadBeans(applicationContext.getBeansOfType(RestService.class));
-    }
-
     @Override
     public RestServiceManager getObject() {
-        loadBeanOfTypeRestService();
+        restServiceManagerBean.load(applicationContext);
         return restServiceManagerBean;
     }
 
@@ -37,12 +33,14 @@ public class RestServiceManagerBeanFactory implements FactoryBean<RestServiceMan
         Map<String, RestService> restServiceRegistry = newHashMap();
 
         @SuppressWarnings("rawtypes")
-        void loadBeans(final Map<String, RestService> beansOfType) {
+        @Override
+        public void load(ApplicationContext applicationContext) {
+            Map<String, RestService> beansOfType = applicationContext.getBeansOfType(RestService.class);
             restServiceRegistry.clear();
             restServiceRegistry.putAll(beansOfType);
         }
 
-        @SuppressWarnings({"unchecked", "rawtypes"})
+        @SuppressWarnings({"rawtypes", "unchecked"})
         @Override
         public RestService locateByName(final String restServiceName) throws RestServiceNameNotFoundException {
             if (restServiceRegistry.containsKey(restServiceName)) {
