@@ -32,7 +32,7 @@ class ClassPathUtil {
         throw new IllegalAccessError("You can not instantiate an utility class.");
     }
 
-    public static void mergeIntoParent(ApplicationContext parentContext, AnnotationConfigApplicationContext childContext) {
+    static void mergeIntoParent(ApplicationContext parentContext, AnnotationConfigApplicationContext childContext) {
         if (!(parentContext.getAutowireCapableBeanFactory() instanceof BeanDefinitionRegistry parentRegistry)) {
             throw new IllegalStateException("Parent context is not a BeanDefinitionRegistry");
         }
