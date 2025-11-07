@@ -8,16 +8,18 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.5</version>
+        <relativePath/>
     </parent>
 
     <groupId>be.urpi.software.modular</groupId>
-    <artifactId>be.urpi.software.modular.root</artifactId>
+    <artifactId>modular.root</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>core/be.urpi.software.modular.core.parent</module>
-        <module>module/be.urpi.software.modular.module.parent</module>
-        <module>ui/be.urpi.software.modular.ui.parent</module>
+        <module>core</module>
+        <module>test</module>
+        <module>module</module>
+        <module>ui</module>
     </modules>
     <name>${application.name} Root</name>
 
@@ -80,16 +82,40 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>be.urpi.software.modular.core</groupId>
-                <artifactId>be.urpi.software.modular.core.watcher</artifactId>
+                <groupId>be.urpi.software.modular.module.classpathloader</groupId>
+                <artifactId>classpathloader.model</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>be.urpi.software.modular.core</groupId>
-                <artifactId>be.urpi.software.modular.core.properties</artifactId>
+                <artifactId>core.rest</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
-
+            <dependency>
+                <groupId>be.urpi.software.modular.core</groupId>
+                <artifactId>core.watcher</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>be.urpi.software.modular.core</groupId>
+                <artifactId>core.properties</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>be.urpi.software.modular.module.classpathloader</groupId>
+                <artifactId>classpathloader.rest</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>be.urpi.software.modular.core</groupId>
+                <artifactId>core.application.reload</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>be.urpi.software.modular.module.security</groupId>
+                <artifactId>security.rest</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
@@ -99,21 +125,6 @@
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>6.1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-                <version>${org.codehaus.jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-                <version>${org.codehaus.jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${org.codehaus.jackson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <property name="HOME_LOG" value="/application/log"/>
+    <property name="CONSOLE_LOG_PATTERN" value="%d{ISO8601} %-5p [%-15.15t] %-40.40c{1}| %m%n"/>
+    <springProperty scope="context" name="appName" source="spring.application.name"/>
+    <springProperty scope="context" name="orgName" source="spring.application.org"/>
+
+    <logger name="be.urpi.software" level="DEBUG"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <springProfile name="docker">
+        <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${HOME_LOG}/main.log</file>
+
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${HOME_LOG}/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <!-- each archived file, size max 10MB -->
+                <maxFileSize>10MB</maxFileSize>
+                <!-- total size of all archive files, if total size > 20GB,
+                    it will delete old archived file -->
+                <totalSizeCap>20GB</totalSizeCap>
+                <!-- 60 days to keep -->
+                <maxHistory>60</maxHistory>
+            </rollingPolicy>
+
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="be.urpi.software" level="info" additivity="false">
+            <appender-ref ref="FILE-ROLLING"/>
+        </logger>
+
+        <root level="error">
+            <appender-ref ref="FILE-ROLLING"/>
+        </root>
+    </springProfile>
+</configuration>

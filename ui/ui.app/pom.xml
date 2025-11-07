@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ui.parent</artifactId>
+        <groupId>be.urpi.software.modular.ui</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <name>${ui.application.name} App</name>
+    <artifactId>ui.app</artifactId>
+    <packaging>jar</packaging>
+    <dependencies>
+        <!--   <dependency>
+               <groupId>be.urpi.software.modular.ui</groupId>
+               <artifactId>ui.static.resources</artifactId>
+               <version>1.0-SNAPSHOT</version>
+           </dependency>-->
+        <dependency>
+            <groupId>be.urpi.software.modular.module.classpathloader</groupId>
+            <artifactId>classpathloader.rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>be.urpi.software.modular.module.security</groupId>
+            <artifactId>security.rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    </dependencies>
+</project>

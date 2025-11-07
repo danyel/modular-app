@@ -1,0 +1,38 @@
+package be.urpi.software.modular.core.filesystem.configuration;
+
+import be.urpi.software.modular.core.application.reload.ClassPathReload;
+import be.urpi.software.modular.core.application.reload.ClassPathSourceDirectory;
+import be.urpi.software.modular.core.watcher.directory.DirectoryWatchAble;
+import be.urpi.software.modular.core.watcher.directory.ThreadDirectoryWatcher;
+import be.urpi.software.modular.core.watcher.file.FileWatchAble;
+import be.urpi.software.modular.core.watcher.file.ThreadFileWatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.Bean;
+
+@AutoConfiguration
+class FileWatcherAutoConfiguration {
+    private static final Logger log = LoggerFactory.getLogger(FileWatcherAutoConfiguration.class);
+
+    @Bean
+    FileWatchAble classPathReload(@Value("${module.reload.destination}") String destinationFolder) throws Exception {
+        FileWatchAble classPathReload = new ClassPathReload(destinationFolder);
+        classPathReload.afterPropertiesSet();
+        log.info("Configuring classPath watcher {}", destinationFolder);
+        ThreadFileWatcher threadDirectoryWatcher = new ThreadFileWatcher(classPathReload);
+        threadDirectoryWatcher.start();
+        return classPathReload;
+    }
+
+    @Bean
+    DirectoryWatchAble classSourceDirectory(@Value("${module.reload.source}") String source, @Value("${module.reload.destination}") String destination) throws Exception {
+        DirectoryWatchAble classPathReload = new ClassPathSourceDirectory(source, destination);
+        classPathReload.afterPropertiesSet();
+        log.info("Configuring directory watcher {}", source);
+        ThreadDirectoryWatcher threadDirectoryWatcher = new ThreadDirectoryWatcher(classPathReload);
+        threadDirectoryWatcher.start();
+        return classPathReload;
+    }
+}
