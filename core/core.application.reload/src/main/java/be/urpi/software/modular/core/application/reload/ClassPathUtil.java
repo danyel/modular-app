@@ -8,10 +8,14 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 class ClassPathUtil {
     static final Logger log = LoggerFactory.getLogger(ClassPathUtil.class);
     static final String JAVA_CLASS_PATH = "java.class.path";
+    private static final Map<File, AnnotationConfigApplicationContext> modules = new ConcurrentHashMap<>();
+
 
     ClassPathUtil() {
         throw new IllegalAccessError("You can not instantiate an utility class.");
@@ -44,12 +48,15 @@ class ClassPathUtil {
 
     static void refresh(ApplicationContext applicationContext, File file) {
         ClassLoader parent = ClassLoader.getSystemClassLoader();
-        try (AnnotationConfigApplicationContext moduleContext = new AnnotationConfigApplicationContext(); URLClassLoader newLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, parent)) {
+        try {
+            AnnotationConfigApplicationContext moduleContext = new AnnotationConfigApplicationContext();
+            URLClassLoader newLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, parent);
             moduleContext.setParent(applicationContext);
             moduleContext.setClassLoader(newLoader);
             moduleContext.refresh();
+            modules.put(file, moduleContext);
             log.debug("Application context for file: {}", file.getAbsolutePath());
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
