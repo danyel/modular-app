@@ -46,7 +46,7 @@ class FileWatcherAutoConfiguration implements ApplicationContextAware {
     @Bean
     ThreadWatcher threadFileWatcher(@Autowired FileWatchAble sourceDirectoryToWatch, @Autowired FileWatchAble classPathReload) {
         ThreadWatcher threadDirectoryWatcher = new ThreadWatcher(new LinkedList<>(List.of(sourceDirectoryToWatch, classPathReload)));
-        threadDirectoryWatcher.setObservablePath(sourceDirectoryToWatch().getFile());
+        threadDirectoryWatcher.setObservablePath(sourceDirectoryToWatch.getFile());
         threadDirectoryWatcher.start();
         return threadDirectoryWatcher;
     }
@@ -57,8 +57,6 @@ class FileWatcherAutoConfiguration implements ApplicationContextAware {
         FileWatchAble sourceDirectoryToWatch = applicationContext.getBean("sourceDirectoryToWatch", FileWatchAble.class);
         for (File file : Objects.requireNonNullElse(new File(source).listFiles(), new File[0])) {
             sourceDirectoryToWatch.doOnChange(file);
-        }
-        for (File file : Objects.requireNonNullElse(new File(destination).listFiles(), new File[0])) {
             classPathReload.doOnChange(file);
         }
     }
