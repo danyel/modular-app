@@ -19,7 +19,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -115,7 +114,7 @@ class ApplicationContextUtil {
             pathLookup.setAccessible(true);
             pathLookup.set(mappingRegistry, new LinkedMultiValueMap<>());
             nameLookup.setAccessible(true);
-            nameLookup.set(mappingRegistry, new  ConcurrentHashMap<>());
+            nameLookup.set(mappingRegistry, new ConcurrentHashMap<>());
             registry.setAccessible(false);
             pathLookup.setAccessible(false);
             nameLookup.setAccessible(false);

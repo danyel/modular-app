@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
-import java.util.Objects;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
@@ -51,16 +50,15 @@ public class ClassPathSourceDirectory implements FileWatchAble {
     }
 
     @Override
-    public void doOnChange() throws IOException {
-        for (File file : Objects.requireNonNullElse(sourceDirectory.listFiles(), new File[0])) {
-            if (file.getName().endsWith(".jar")) {
-                File sourceFile = new File(sourceDirectory, file.getName());
-                File destinationFile = new File(destinationDirectory, file.getName());
-                log.debug("Changing file {} from {} to {}", file.getName(), sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath());
-                FileUtils.copyFile(sourceFile, destinationFile);
-                log.debug("Deleting file {}", sourceFile.getAbsolutePath());
-                FileUtils.forceDelete(sourceFile);
-            }
+    public void doOnChange(File file) throws IOException {
+        File jarFile = new File(sourceDirectory, file.getName());
+        if (jarFile.getName().endsWith(".jar")) {
+            File sourceFile = new File(sourceDirectory, jarFile.getName());
+            File destinationFile = new File(destinationDirectory, jarFile.getName());
+            log.debug("Changing file {} from {} to {}", jarFile.getName(), sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath());
+            FileUtils.copyFile(sourceFile, destinationFile);
+            log.debug("Deleting file {}", sourceFile.getAbsolutePath());
+            FileUtils.forceDelete(sourceFile);
         }
     }
 }

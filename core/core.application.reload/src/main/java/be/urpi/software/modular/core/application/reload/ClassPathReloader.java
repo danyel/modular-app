@@ -7,7 +7,6 @@ import be.urpi.software.modular.core.properties.SpringContextType;
 import be.urpi.software.modular.core.watcher.file.FileWatchAble;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -19,9 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
@@ -61,22 +57,18 @@ public class ClassPathReloader implements FileWatchAble, ApplicationContextAware
     }
 
     @Override
-    public void doOnChange() throws IOException {
-        List<File> files = Arrays.asList(Objects.requireNonNullElse(destinationDirectory.listFiles(), new File[0]));
-        log.debug("How much files in directory: {}", Strings.join(files.stream().map(File::getName).toList(), ','));
-        for (File file : files) {
-            log.debug("ClassPathReloader: {}", file.getAbsolutePath());
-            InputStream inputStream = JarFileUtil.getInputStream(applicationContext, file, "META-INF/modular.properties");
-            ModularProperties modularProperties = new ModularProperties();
-            modularProperties.load(inputStream);
-            ApplicationPropertiesWatcher applicationPropertiesWatcher = new ApplicationPropertiesWatcher(modularProperties, applicationContext, file);
-            applicationPropertiesWatcher.checkState();
-            applicationPropertiesWatcher.doOnChange();
-            if (modularProperties.getType() == SpringContextType.JAVA) {
-                ApplicationContextUtil.refresh(modularProperties, applicationContext, file);
-            } else {
-                ApplicationContextUtil.refreshXml(modularProperties, applicationContext, file);
-            }
+    public void doOnChange(File file) throws IOException {
+        File jarFile = new File(destinationDirectory, file.getName());
+        log.debug("ClassPathReloader: {}", jarFile.getAbsolutePath());
+        InputStream inputStream = JarFileUtil.getInputStream(applicationContext, jarFile, "META-INF/modular.properties");
+        ModularProperties modularProperties = new ModularProperties();
+        modularProperties.load(inputStream);
+        ApplicationPropertiesWatcher applicationPropertiesWatcher = new ApplicationPropertiesWatcher(modularProperties, applicationContext);
+        applicationPropertiesWatcher.doOnChange(jarFile);
+        if (modularProperties.getType() == SpringContextType.JAVA) {
+            ApplicationContextUtil.refresh(modularProperties, applicationContext, jarFile);
+        } else {
+            ApplicationContextUtil.refreshXml(modularProperties, applicationContext, jarFile);
         }
     }
 

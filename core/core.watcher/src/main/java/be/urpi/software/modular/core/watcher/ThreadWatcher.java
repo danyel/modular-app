@@ -1,35 +1,36 @@
 package be.urpi.software.modular.core.watcher;
 
-import be.urpi.software.modular.core.watcher.directory.DirectoryWatchAble;
 import be.urpi.software.modular.core.watcher.file.FileWatchAble;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Boolean.TRUE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
-public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread implements Watcher<WA>, InitializingBean {
-    private final WA watchAble;
+public class ThreadWatcher extends Thread implements Watcher<FileWatchAble> {
+    private final LinkedList<FileWatchAble> watchAbles;
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final WatchService watchService;
+    @Setter
+    private File observablePath;
 
-    protected AbstractThreadWatcher(WA watchAble) throws WatchAbleException {
-        checkNotNull(watchAble);
-        watchAble.checkState();
+    public ThreadWatcher(LinkedList<FileWatchAble> watchAbles) throws WatchAbleException {
+        checkNotNull(watchAbles);
         try {
             watchService = FileSystems.getDefault().newWatchService();
-            this.watchAble = watchAble;
-            log.info("Starting watcher {}", watchAble.getFile().getAbsolutePath());
-            watchAble.checkState();
+            this.watchAbles = watchAbles;
+            for (FileWatchAble wa : watchAbles) {
+                wa.checkState();
+            }
         } catch (Exception exception) {
             throw new WatchAbleException(exception);
         }
@@ -51,10 +52,8 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
     public synchronized void startThread() {
         if (watchService != null) {
             try {
-                log.debug("Starting the thread {}", watchAble.getFile().getAbsolutePath());
-                doOnStart();
-                Path path = watchAble instanceof FileWatchAble ? getFile().toPath().getParent() : getFile().toPath();
-                log.debug("Registering {} on the watch service", path.getFileName());
+                log.debug("Starting the thread {}", observablePath.getAbsolutePath());
+                Path path = observablePath.toPath();
                 path.register(watchService, on());
             } catch (IOException e) {
                 throw new WatchAbleException(e);
@@ -85,13 +84,9 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
                     @SuppressWarnings("unchecked")
                     WatchEvent<Path> ev = (WatchEvent<Path>) event;
                     Path filename = ev.context();
-                    log.debug("File Watchable: {} and for folder: {}", watchAble.getClass().getSimpleName(), getFile().getAbsolutePath());
-                    if (watchAble instanceof FileWatchAble fileWatchAble) {
-                        fileWatchAble.doOnChange();
-                    }
-
-                    if (watchAble instanceof DirectoryWatchAble directoryWatchAble) {
-                        directoryWatchAble.doOnChange(filename.toFile());
+                    for (FileWatchAble watchAble : watchAbles) {
+                        log.debug("File Watchable: {} and for folder: {}", watchAble.getClass().getSimpleName(), filename.toFile().getAbsolutePath());
+                        watchAble.doOnChange(filename.toFile());
                     }
                 }
 
@@ -107,20 +102,7 @@ public abstract class AbstractThreadWatcher<WA extends WatchAble> extends Thread
         }
     }
 
-    File getFile() throws IOException {
-        return watchAble.getFile();
-    }
-
-    void doOnStart() throws IOException {
-        watchAble.doOnStart();
-    }
-
     WatchEvent.Kind<Path>[] on() {
-        return watchAble.on();
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        checkState(watchAble instanceof FileWatchAble || watchAble instanceof DirectoryWatchAble);
+        return watchAbles.getFirst().on();
     }
 }

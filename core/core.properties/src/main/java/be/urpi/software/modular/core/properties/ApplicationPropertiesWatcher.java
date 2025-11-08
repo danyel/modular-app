@@ -3,7 +3,6 @@ package be.urpi.software.modular.core.properties;
 import be.urpi.software.modular.core.jar.util.JarFileUtil;
 import be.urpi.software.modular.core.watcher.WatchAbleException;
 import be.urpi.software.modular.core.watcher.file.FileWatchAble;
-import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.context.ApplicationContext;
@@ -13,7 +12,6 @@ import org.springframework.core.env.PropertiesPropertySource;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.util.List;
@@ -22,14 +20,11 @@ import java.util.function.Predicate;
 
 @Slf4j
 public class ApplicationPropertiesWatcher implements FileWatchAble {
-    private static final String propertyName = "module.name";
     private final ConfigurableEnvironment environment;
     private final ApplicationContext applicationContext;
-    private final File jarFile;
     private final ModularProperties modularProperties;
 
-    public ApplicationPropertiesWatcher(ModularProperties modularProperties, ApplicationContext applicationContext, File jarFile) {
-        this.jarFile = jarFile;
+    public ApplicationPropertiesWatcher(ModularProperties modularProperties, ApplicationContext applicationContext) {
         this.modularProperties = modularProperties;
         this.applicationContext = applicationContext;
         this.environment = applicationContext instanceof ConfigurableApplicationContext configurableApplicationContext
@@ -38,7 +33,7 @@ public class ApplicationPropertiesWatcher implements FileWatchAble {
     }
 
     @Override
-    public void doOnChange() {
+    public void doOnChange(File jarFile) {
         try {
             if (environment != null) {
                 Predicate<String> filter = fileName -> {
@@ -69,7 +64,7 @@ public class ApplicationPropertiesWatcher implements FileWatchAble {
 
     @Override
     public File getFile() {
-        return jarFile;
+        return null;
     }
 
     @Override
@@ -81,6 +76,5 @@ public class ApplicationPropertiesWatcher implements FileWatchAble {
 
     @Override
     public void checkState() throws WatchAbleException {
-        Preconditions.checkState(jarFile.exists());
     }
 }
