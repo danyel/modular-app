@@ -35,7 +35,6 @@ public class RestServiceManagerBeanFactory implements FactoryBean<RestServiceMan
         @Override
         public void load(ApplicationContext applicationContext) {
             Map<String, RestService> beansOfType = applicationContext.getBeansOfType(RestService.class);
-            restServiceRegistry.clear();
             restServiceRegistry.putAll(beansOfType);
         }
 

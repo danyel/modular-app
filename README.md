@@ -15,3 +15,27 @@ File watcher will be used to scan the module directory for new libraries and mov
 
 ## How to build
 ``mvn clean install``
+
+## Functionalities
+### Import modules dynamically
+#### Define the structure of the module
+
+This is an example of a plugin called: user-management
+
+<pre lang="markdown"> 
+user-management-plugin/ 
+├── ../../*.class
+├── META-INF/ 
+│       └── modular.properties
+└── modular-user-management.properties
+</pre>
+
+##### modular.properties
+```properties
+module.name=user-management
+```
+
+##### modular-user-management.properties
+```properties
+.... all spring properties to configure the spring beans
+```

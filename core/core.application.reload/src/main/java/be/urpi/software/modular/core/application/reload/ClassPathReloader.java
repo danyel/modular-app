@@ -1,17 +1,26 @@
 package be.urpi.software.modular.core.application.reload;
 
+import be.urpi.software.modular.core.jar.util.JarFileUtil;
 import be.urpi.software.modular.core.properties.ApplicationPropertiesWatcher;
+import be.urpi.software.modular.core.properties.ModularProperties;
+import be.urpi.software.modular.core.properties.SpringContextType;
 import be.urpi.software.modular.core.watcher.file.FileWatchAble;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.GenericApplicationContext;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
@@ -28,7 +37,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 @Slf4j
 public class ClassPathReloader implements FileWatchAble, ApplicationContextAware {
     private final File destinationDirectory;
-    private ApplicationContext applicationContext;
+    private GenericApplicationContext applicationContext;
 
     public ClassPathReloader(String destination) {
         destinationDirectory = new File(destination);
@@ -52,18 +61,29 @@ public class ClassPathReloader implements FileWatchAble, ApplicationContextAware
     }
 
     @Override
-    public void doOnChange() {
-        for (File file : Objects.requireNonNullElse(destinationDirectory.listFiles(), new File[0])) {
+    public void doOnChange() throws IOException {
+        List<File> files = Arrays.asList(Objects.requireNonNullElse(destinationDirectory.listFiles(), new File[0]));
+        log.debug("How much files in directory: {}", Strings.join(files.stream().map(File::getName).toList(), ','));
+        for (File file : files) {
             log.debug("ClassPathReloader: {}", file.getAbsolutePath());
-            ApplicationPropertiesWatcher applicationPropertiesWatcher = new ApplicationPropertiesWatcher(applicationContext, file);
+            InputStream inputStream = JarFileUtil.getInputStream(applicationContext, file, "META-INF/modular.properties");
+            ModularProperties modularProperties = new ModularProperties();
+            modularProperties.load(inputStream);
+            ApplicationPropertiesWatcher applicationPropertiesWatcher = new ApplicationPropertiesWatcher(modularProperties, applicationContext, file);
             applicationPropertiesWatcher.checkState();
             applicationPropertiesWatcher.doOnChange();
-            ApplicationContextUtil.refresh(applicationContext, file);
+            if (modularProperties.getType() == SpringContextType.JAVA) {
+                ApplicationContextUtil.refresh(modularProperties, applicationContext, file);
+            } else {
+                ApplicationContextUtil.refreshXml(modularProperties, applicationContext, file);
+            }
         }
     }
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
+        if (applicationContext instanceof GenericApplicationContext genericApplicationContext) {
+            this.applicationContext = genericApplicationContext;
+        }
     }
 }

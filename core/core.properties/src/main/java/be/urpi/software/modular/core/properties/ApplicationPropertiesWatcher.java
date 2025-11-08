@@ -26,9 +26,11 @@ public class ApplicationPropertiesWatcher implements FileWatchAble {
     private final ConfigurableEnvironment environment;
     private final ApplicationContext applicationContext;
     private final File jarFile;
+    private final ModularProperties modularProperties;
 
-    public ApplicationPropertiesWatcher(ApplicationContext applicationContext, File jarFile) {
+    public ApplicationPropertiesWatcher(ModularProperties modularProperties, ApplicationContext applicationContext, File jarFile) {
         this.jarFile = jarFile;
+        this.modularProperties = modularProperties;
         this.applicationContext = applicationContext;
         this.environment = applicationContext instanceof ConfigurableApplicationContext configurableApplicationContext
                 ? configurableApplicationContext.getEnvironment()
@@ -39,13 +41,10 @@ public class ApplicationPropertiesWatcher implements FileWatchAble {
     public void doOnChange() {
         try {
             if (environment != null) {
-                InputStream inputStream = JarFileUtil.getInputStream(applicationContext, jarFile, "META-INF/modular.properties");
-                Properties properties = new Properties();
-                properties.load(inputStream);
                 Predicate<String> filter = fileName -> {
-                    String yamlFile = "modular-%s.yaml".formatted(properties.getOrDefault(propertyName, ""));
-                    String propertiesFile = "modular-%s.properties".formatted(properties.getOrDefault(propertyName, ""));
-                    String ymlFile = "modular-%s.yml".formatted(properties.getOrDefault(propertyName, ""));
+                    String yamlFile = "modular-%s.yaml".formatted(modularProperties.getName());
+                    String propertiesFile = "modular-%s.properties".formatted(modularProperties.getName());
+                    String ymlFile = "modular-%s.yml".formatted(modularProperties.getName());
                     return fileName.contains(propertiesFile) || fileName.contains(ymlFile) || fileName.contains(yamlFile);
                 };
                 List<String> entries = JarFileUtil.getEntries(jarFile, filter);
@@ -56,10 +55,10 @@ public class ApplicationPropertiesWatcher implements FileWatchAble {
                         throw new WatchAbleException(new IllegalStateException(message));
                     }
                     String entry = entries.getFirst();
-                    Properties modularProperties = new Properties();
-                    modularProperties.load(JarFileUtil.getInputStream(applicationContext, jarFile, entry));
+                    Properties modularApplicationProperties = new Properties();
+                    modularApplicationProperties.load(JarFileUtil.getInputStream(applicationContext, jarFile, entry));
                     if (!environment.getPropertySources().contains(entry)) {
-                        environment.getPropertySources().addFirst(new PropertiesPropertySource(entry, modularProperties));
+                        environment.getPropertySources().addFirst(new PropertiesPropertySource(entry, modularApplicationProperties));
                     }
                 }
             }
